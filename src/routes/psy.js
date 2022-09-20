@@ -13,6 +13,7 @@ router.get("/psy", async (req, res) => {
       day: 1,
       hour: 1,
       timeBreak: 1,
+      schedule: 1,
       _id: 0,
     });
 
