@@ -26,22 +26,6 @@ router.post('/client', async (req,res)=>{
 })
 
 
-//RUTA PARA CREAR UNA CITA, PASANDO EL ID DEL CLIENTE Y DEL PSY
-// router.post('/client/:id', async (req,res)=>{
-// try {
-//     const {id}=req.params
-//     const {day, hour, psy}=req.body
-//     const client=await Client.findById(id)
-//     const psyClient= await Psy.findById(psy)
-//     console.log(111, psyClient)
-//     client.appointment.push({day, hour, psy})
-//     await client.save()
-//     res.send(client)
-// } catch (error) {
-//     console.log("el error es:", error)
-// }   
-// })
-
 //RUTA PARA TRAER TODAS LAS CITAS DE UN CLIENTE
 router.get('/client/:id', async (req,res)=>{
     const {id}=req.params
