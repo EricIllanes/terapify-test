@@ -29,7 +29,12 @@ router.post('/client', async (req,res)=>{
 //RUTA PARA TRAER TODAS LAS CITAS DE UN CLIENTE
 router.get('/client/:id', async (req,res)=>{
     const {id}=req.params
-    const client=await Client.findById(id).populate('appointment.psy')
+    const client=await Client.findById(id).populate('appointment',{
+        _id:0,
+        date:1,
+        hour:1,
+        psy:1,
+    })
     res.send(client)  
 })
 
