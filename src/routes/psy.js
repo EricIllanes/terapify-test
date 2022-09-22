@@ -33,6 +33,7 @@ router.get("/psy", async (req, res) => {
     console.log(error);
   }
 });
+
 //RUTA PARA CONONCER HORAS DISPONIBLES DE UN PSY PASANDO SU ID
 router.get("/psy/:id", async (req, res) => {
   try {

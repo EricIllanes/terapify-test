@@ -12,13 +12,3 @@ const PsySchema = new Schema(
 const Psy = model('Psy', PsySchema);	
 
 module.exports= Psy;
-
-
-/*
-hours: 
-[
-day:'Lunes',
-hour: '9:00 - 15:00',
-descanso: '12:00 - 13:00'
-]
-*/

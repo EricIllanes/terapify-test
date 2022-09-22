@@ -5,6 +5,7 @@ const Psy = require("../models/Psy.js");
 const Hours = require("../models/Hours.js");
 const Appointment = require("../models/Appointment.js");
 
+// RUTA PARA TRAER TODAS LAS CITAS REALIZADAS
 router.get("/appointment", async (req, res) => {
   try {
     const appointment = await Appointment.find({})
@@ -16,53 +17,59 @@ router.get("/appointment", async (req, res) => {
   }
 });
 
+//RUTA PARA CREAR UNA CITA, PASANDO ID DE CLIENT Y ID DE PSY
 router.post("/appointment", async (req, res) => {
-  const { date, hour, psyID, clientID } = req.body;
-  const psyFind = await Psy.findById(psyID);
-  const clientFind = await Client.findById(clientID);
-  let checkIfHourExist = await Hours.find({
-    day: date,
-    schedule: { $elemMatch: { intHour: hour } },
-  });
-
-  if(checkIfHourExist.length>=1){
-    let checkHourAvailability = checkIfHourExist[0].schedule.find(
-      (e) => e.intHour === hour
-    );
-    if (checkHourAvailability.available === false) {
-      res.status(406).json({
-        message:
-          "La hora seleccionada no está disponible, por favor intenta con otra opción",
-      });
-    } else {
-      const newAppointment = new Appointment({
-        date,
-        hour,
-        psy: psyFind._id,
-        client: clientFind._id,
-      });
-      await newAppointment.save();
-      clientFind.appointment = clientFind.appointment.concat(newAppointment._id);
-      await clientFind.save();
-
-      // cambiamos el status de la hora solicitada  a false para que no se pueda reservar nuevamente
-      await Hours.updateOne(
-        {
-          day: date,
-          schedule:{$elemMatch: {intHour: hour}}
-        },
-        {
-          $set :{ "schedule.$.available": false}
-        }
-      )
-      res.status(200).json(newAppointment);
-     }
-
-
-  } else if (checkIfHourExist.length === 0) {
-    res.status(404).json({
-      message: "No hay horas disponibles en ese horario, por favor intenta con otra opción",
+  try {
+    const { date, hour, psyID, clientID } = req.body;
+    const psyFind = await Psy.findById(psyID);
+    const clientFind = await Client.findById(clientID);
+    let checkIfHourExist = await Hours.find({
+      day: date,
+      schedule: { $elemMatch: { intHour: hour } },
     });
+
+    if (checkIfHourExist.length >= 1) {
+      let checkHourAvailability = checkIfHourExist[0].schedule.find(
+        (e) => e.intHour === hour
+      );
+      if (checkHourAvailability.available === false) {
+        res.status(406).json({
+          message:
+            "La hora seleccionada no está disponible, por favor intenta con otra opción",
+        });
+      } else {
+        const newAppointment = new Appointment({
+          date,
+          hour,
+          psy: psyFind._id,
+          client: clientFind._id,
+        });
+        await newAppointment.save();
+        clientFind.appointment = clientFind.appointment.concat(
+          newAppointment._id
+        );
+        await clientFind.save();
+
+        // cambiamos el status de la hora solicitada  a false para que no se pueda reservar nuevamente
+        await Hours.updateOne(
+          {
+            day: date,
+            schedule: { $elemMatch: { intHour: hour } },
+          },
+          {
+            $set: { "schedule.$.available": false },
+          }
+        );
+        res.status(200).json(newAppointment);
+      }
+    } else if (checkIfHourExist.length === 0) {
+      res.status(404).json({
+        message:
+          "No hay horas disponibles en ese horario, por favor intenta con otra opción",
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
 });
 
